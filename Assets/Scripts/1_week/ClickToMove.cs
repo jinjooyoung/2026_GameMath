@@ -52,7 +52,8 @@ public class ClickToMove : MonoBehaviour
 
         isDashing = value.isPressed;
         isMoving = false;
-        isSprinting = false;
+
+        dashTarget = transform.position + (direction == Vector3.zero ? Vector3.forward : NormalizationVector(direction)) * dashDistance;
     }
 
     // Update is called once per frame
@@ -60,9 +61,13 @@ public class ClickToMove : MonoBehaviour
     {
         if (isDashing)
         {
-            transform.position += NormalizationVector((direction == Vector3.zero ? Vector3.forward : direction) * dashDistance) * dashSpeed * Time.deltaTime;
+            isSprinting = false;
 
-            if (GetMagnitude(dashTarget - transform.position) < 0.1f)
+            Vector3 dashDirection = dashTarget - transform.position;
+
+            transform.position += NormalizationVector(dashDirection) * dashSpeed * Time.deltaTime;
+
+            if (Vector3.Magnitude(dashDirection) < 0.1f)
             {
                 isDashing = false;
             }
@@ -75,7 +80,7 @@ public class ClickToMove : MonoBehaviour
             direction = targetPosition - transform.position;
             transform.position += NormalizationVector(direction) * moveSpeed * (isSprinting ? 3f : 1f) * Time.deltaTime;
             
-            if (GetMagnitude(targetPosition - transform.position) < 0.1f)
+            if (Vector3.Magnitude(targetPosition - transform.position) < 0.1f)
             {
                 isMoving = false;
             }
@@ -86,16 +91,12 @@ public class ClickToMove : MonoBehaviour
 
     public Vector3 NormalizationVector(Vector3 vector)
     {
-        float magnitude = Mathf.Sqrt(GetMagnitude(vector));
+        float sqrMagnitude = vector.x * vector.x + vector.y * vector.y + vector.z * vector.z;
+        float magnitude = Mathf.Sqrt(sqrMagnitude);
 
         if (magnitude > 0)
             return vector / magnitude;
         else
             return Vector3.zero;
-    }
-
-    public float GetMagnitude(Vector3 vector)
-    {
-        return (float)Mathf.Sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z);
     }
 }
