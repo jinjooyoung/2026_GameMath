@@ -197,7 +197,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC2DC\uD589 \uD69F\uC218 \uC785\uB825"
+  m_text: "\uC2DC\uD589 \uD69F\uC218 \uC785\uB825 (1~500)"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9ed36272a08d2ec48bc83fea61113cec, type: 2}
   m_sharedMaterial: {fileID: 3815731550123337525, guid: 9ed36272a08d2ec48bc83fea61113cec, type: 2}
@@ -526,7 +526,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -400}
-  m_SizeDelta: {x: 240, y: 60}
+  m_SizeDelta: {x: 500, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &683191057
 MonoBehaviour:
@@ -933,7 +933,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -320}
-  m_SizeDelta: {x: 240, y: 60}
+  m_SizeDelta: {x: 500, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &747488464
 MonoBehaviour:
