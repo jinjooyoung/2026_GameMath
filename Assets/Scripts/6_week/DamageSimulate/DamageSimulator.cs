@@ -13,9 +13,13 @@ public class DamageSimulator : MonoBehaviour
     public float baseDamage;
     public const float DamageCoefficient = 20f;
     public float totalDamage = 0;
+    public float maximumDamage = 0;
 
     [Header("공격 횟수")]
     public int attackCount = 0;
+    public int critCount = 0;
+    public int weakCount = 0;
+    public int failCount = 0;
 
     [Header("참조 스크립트")]
     public WeaponDB db;
@@ -30,7 +34,11 @@ public class DamageSimulator : MonoBehaviour
     private void ResetData()
     {
         totalDamage = 0;
+        maximumDamage = 0;
         attackCount = 0;
+        critCount = 0;
+        weakCount = 0;
+        failCount = 0;
         level = 1;
         baseDamage = level * DamageCoefficient;
     }
@@ -39,6 +47,7 @@ public class DamageSimulator : MonoBehaviour
     {
         ResetData();
         currentWeapon = db.GetWeaponById(id);
+        ui.UpdateLvUpLogUI();
         ui.UpdateUI();
     }
 
@@ -52,6 +61,16 @@ public class DamageSimulator : MonoBehaviour
         ui.UpdateUI();
     }
 
+    public void OnAttackTimes(int times)
+    {
+        if (times < 0) return;
+
+        for (int i = 0; i < times; i++)
+        {
+            OnAttack();
+        }
+    }
+
     public void OnAttack()
     {
         // 정규분포 데미지 계산
@@ -62,13 +81,48 @@ public class DamageSimulator : MonoBehaviour
         bool isCrit = Random.value < currentWeapon.critRate;
         float finalDamage = isCrit ? normalDamage * currentWeapon.critMult : normalDamage;
 
-        // 통계 누적
-        attackCount++;
-        totalDamage += finalDamage;
+        if (isCrit) critCount++;
+
+        bool isWeak = false;
+        bool isFail = false;
+
+        // 일반 데미지가 정규분포 +2σ 초과 (약점 공격)
+        if (normalDamage > baseDamage + (sd * 2))
+        {
+            isWeak = true;
+            finalDamage *= 2;
+            attackCount++;
+            weakCount++;
+            totalDamage += finalDamage;
+            SaveMaximumDamage(finalDamage);
+        }
+        // 일반 데미지가 정규분포 -2σ 미만 (공격 실패)
+        else if (normalDamage < baseDamage - (sd * 2))
+        {
+            isFail = true;
+            finalDamage = 0;
+            if (isCrit) critCount--;
+            failCount++;
+        }
+        // 기타 일반 or 크리 공격
+        else
+        {
+            attackCount++;
+            totalDamage += finalDamage;
+            SaveMaximumDamage(finalDamage);
+        }
 
         // 로그 및 UI 업데이트
-        ui.UpdateAttackLogUI(isCrit, finalDamage);
+        ui.UpdateAttackLogUI(isCrit, isWeak, isFail, finalDamage);
         ui.UpdateUI();
+    }
+
+    private void SaveMaximumDamage(float damage)
+    {
+        if (maximumDamage < damage)
+        {
+            maximumDamage = damage;
+        }
     }
 
     float GetNormalStdDevDamage(float mean, float stdDev)
